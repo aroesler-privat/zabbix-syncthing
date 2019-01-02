@@ -33,3 +33,6 @@ The REST-call needed to fetch those data is quite expensive (as the Syncthing-de
 
 ## You want more?
 When calling the script like <code>./syncthing.sh --api-key="mykey" --folder="myfolder" --status | jq</code> all the fields you may request are given. Feel free to change the template to fetch other values. 
+
+## Screenshot
+![Screenshot / Zabbix Map with Syncthing-Hosts](https://share.zabbix.com/media/com_mtree/images/listings/m/580.jpg)

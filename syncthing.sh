@@ -1,9 +1,9 @@
 #!/bin/bash
 
-CURL=`which curl`
-JQ=`which jq`
-DATE=`which date`
-ZABBIX_SENDER=`which zabbix_sender`
+CURL=$(which curl)
+JQ=$(which jq)
+DATE=$(which date)
+ZABBIX_SENDER=$(which zabbix_sender)
 
 SYNCTHING_HOST=""
 SYNCTHING_FOLDER=""
@@ -42,11 +42,13 @@ function send_to_zabbix() { ###################################################
 ###############################################################################
 
         if [ "$ZABBIX_DRYRUN" == "0" ] ; then
-                echo $ZABBIX_INPUT | tr '|' '\n' | \
-                RESULT=`$ZABBIX_SENDER -z $ZABBIX_SERVER -T -i -`
-		[ "$?" == 0 ] || echo "send_to_zabbix failed with $RESULT, command was $ZABBIX_INPUT"
+                echo "$ZABBIX_INPUT" | tr '|' '\n' | \
+		if RESULT=$($ZABBIX_SENDER -z $ZABBIX_SERVER -T -i -)
+		then 
+		echo "send_to_zabbix failed with $RESULT, command was $ZABBIX_INPUT"
+		fi
         else
-                echo $ZABBIX_INPUT | tr '|' '\n'
+                echo "$ZABBIX_INPUT" | tr '|' '\n'
         fi
 }
 
@@ -64,7 +66,7 @@ function add_syncthing_host() { ###############################################
 	SYNCTHING_PORT[$HOST]=$PORT
 	SYNCTHING_API[$HOST]=$APIkey
 
-	SYNCTHING_DEVID[$HOST]=`$CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://${SYNCTHING_IP[$HOST]}:${SYNCTHING_PORT[$HOST]}/rest/system/status | $JQ ".myID" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/`
+	SYNCTHING_DEVID[$HOST]=$($CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://"${SYNCTHING_IP[$HOST]}":"${SYNCTHING_PORT[$HOST]}"/rest/system/status | $JQ ".myID" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/)
 
 	SYNCTHING_HOSTS+=( "$HOST" )
 }
@@ -77,9 +79,9 @@ function get_folder_id() { ####################################################
 	HOST=$1
 	NAME=$2
 
-	ID=`$CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://${SYNCTHING_IP[$HOST]}:${SYNCTHING_PORT[$HOST]}/rest/system/config | $JQ ".folders[] | select(.label | contains(\"$NAME\"))" | $JQ '.id'`
+	ID=$($CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://"${SYNCTHING_IP[$HOST]}":"${SYNCTHING_PORT[$HOST]}"/rest/system/config | $JQ ".folders[] | select(.label | contains(\"$NAME\"))" | $JQ '.id')
 
-	echo -n $ID | sed -es/"^\"\([^\"]*\)\"$"/"\1"/
+	echo -n "$ID" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/
 }
 
 function get_folder_device_ids() { ############################################
@@ -90,9 +92,9 @@ function get_folder_device_ids() { ############################################
 	HOST=$1
 	NAME=$2
 
-	IDS=`$CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://${SYNCTHING_IP[$HOST]}:${SYNCTHING_PORT[$HOST]}/rest/system/config | $JQ ".folders[] | select(.label | contains(\"$NAME\"))" | $JQ ".devices[] | .deviceID" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/ | tr '\n' ' '`
+	IDS=$($CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://"${SYNCTHING_IP[$HOST]}":"${SYNCTHING_PORT[$HOST]}"/rest/system/config | $JQ ".folders[] | select(.label | contains(\"$NAME\"))" | $JQ ".devices[] | .deviceID" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/ | tr '\n' ' ')
 
-	echo -n $IDS | sed -es/"${SYNCTHING_DEVID[$HOST]}"/""/
+	echo -n "$IDS" | sed -es/"${SYNCTHING_DEVID[$HOST]}"/""/
 }
 
 function get_folder_lastsync_time() { #########################################
@@ -103,11 +105,11 @@ function get_folder_lastsync_time() { #########################################
 	HOST=$1
 	NAME=$2
 
-	ID=`get_folder_id $HOST $NAME`
+	ID=$(get_folder_id "$HOST" "$NAME")
 
-	LASTSCAN=`$CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://${SYNCTHING_IP[$HOST]}:${SYNCTHING_PORT[$HOST]}/rest/stats/folder | $JQ ".\"$ID\".lastFile.at" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/`
+	LASTSCAN=$($CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://"${SYNCTHING_IP[$HOST]}":"${SYNCTHING_PORT[$HOST]}"/rest/stats/folder | $JQ ".\"$ID\".lastFile.at" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/)
 
-	LAST_SEC=`$DATE -d "$LASTSCAN" +"%Y-%m-%d %H:%M.%S"`
+	LAST_SEC=$($DATE -d "$LASTSCAN" +"%Y-%m-%d %H:%M.%S")
 
 	echo -n "$LAST_SEC"
 }
@@ -120,9 +122,9 @@ function get_folder_lastsync_file() { #########################################
 	HOST=$1
 	NAME=$2
 
-	ID=`get_folder_id $HOST $NAME`
+	ID=$(get_folder_id "$HOST" "$NAME")
 
-	LASTFILE=`$CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://${SYNCTHING_IP[$HOST]}:${SYNCTHING_PORT[$HOST]}/rest/stats/folder | $JQ ".\"$ID\".lastFile.filename" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/`
+	LASTFILE=$($CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://"${SYNCTHING_IP[$HOST]}":"${SYNCTHING_PORT[$HOST]}"/rest/stats/folder | $JQ ".\"$ID\".lastFile.filename" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/)
 
 	echo -n "$LASTFILE"
 }
@@ -135,11 +137,11 @@ function get_folder_lastscan() { ##############################################
 	HOST=$1
 	NAME=$2
 
-	ID=`get_folder_id $HOST $NAME`
+	ID=$(get_folder_id "$HOST" "$NAME")
 
-	LASTSCAN=`$CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://${SYNCTHING_IP[$HOST]}:${SYNCTHING_PORT[$HOST]}/rest/stats/folder | $JQ ".\"$ID\".lastScan" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/`
+	LASTSCAN=$($CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://"${SYNCTHING_IP[$HOST]}":"${SYNCTHING_PORT[$HOST]}"/rest/stats/folder | $JQ ".\"$ID\".lastScan" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/)
 
-	LAST_SEC=`$DATE -d "$LASTSCAN" +"%Y-%m-%d %H:%M.%S"`
+	LAST_SEC=$($DATE -d "$LASTSCAN" +"%Y-%m-%d %H:%M.%S")
 
 	echo -n "$LAST_SEC"
 }
@@ -157,28 +159,28 @@ function get_folder_status() { ################################################
 	NAME=$2
 	FLAGS=$3
 
-	ID=`get_folder_id $HOST $NAME`
+	ID=$(get_folder_id "$HOST" "$NAME")
 
-	STATUS=`$CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://${SYNCTHING_IP[$HOST]}:${SYNCTHING_PORT[$HOST]}/rest/db/status?folder=$ID`
+	STATUS=$($CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://"${SYNCTHING_IP[$HOST]}":"${SYNCTHING_PORT[$HOST]}"/rest/db/status?folder="$ID")
 
 	if [ -z "$FLAGS" ] ; then
-		echo $STATUS
+		echo "$STATUS"
 		exit 0
 	else
-		TIME=`echo $STATUS | $JQ ".stateChanged" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/`
-		TIMESTAMP=`$DATE -d "$TIME" +"%s"`
+		TIME=$(echo "$STATUS" | $JQ ".stateChanged" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/)
+		TIMESTAMP=$($DATE -d "$TIME" +"%s")
 
 		create_zabbix_input
 
-		for FLAG in `echo $FLAGS | tr ',' ' '` ; do
-			VALUE=`echo $STATUS | $JQ ".$FLAG" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/`
+		for FLAG in $(echo "$FLAGS" | tr ',' ' ') ; do
+			VALUE=$(echo "$STATUS" | $JQ ".$FLAG" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/)
 			create_zabbix_input "$ZABBIX_HOST" "$FLAG" "$TIMESTAMP" "$VALUE"
 		done
 
 		send_to_zabbix
 	fi
 
-	RETURN=`echo $STATUS | $JQ ".errors"`
+	RETURN=$(echo "$STATUS" | $JQ ".errors")
 
 	echo -n "$RETURN"
 }
@@ -191,9 +193,9 @@ function get_device_name() { ##################################################
 	HOST=$1
 	ID=$2
 
-	NAME=`$CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://${SYNCTHING_IP[$HOST]}:${SYNCTHING_PORT[$HOST]}/rest/system/config | $JQ ".devices[] | select(.deviceID | contains(\"$ID\"))" | $JQ ".name"`
+	NAME=$($CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://"${SYNCTHING_IP[$HOST]}":"${SYNCTHING_PORT[$HOST]}"/rest/system/config | $JQ ".devices[] | select(.deviceID | contains(\"$ID\"))" | $JQ ".name")
 
-	echo -n $NAME | sed -es/"^\"\([^\"]*\)\"$"/"\1"/
+	echo -n "$NAME" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/
 }
 
 function get_device_lastseen() { ##############################################
@@ -204,11 +206,11 @@ function get_device_lastseen() { ##############################################
 	HOST=$1
 	ID=$2
 
-	LASTSEEN=`$CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://${SYNCTHING_IP[$HOST]}:${SYNCTHING_PORT[$HOST]}/rest/stats/device | jq ".\"$ID\".lastSeen" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/`
+	LASTSEEN=$($CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://"${SYNCTHING_IP[$HOST]}":"${SYNCTHING_PORT[$HOST]}"/rest/stats/device | jq ".\"$ID\".lastSeen" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/)
 
-	LAST_SEC=`$DATE -d "$LASTSEEN" +"%Y-%m-%d %H:%M.%S"`
+	LAST_SEC=$($DATE -d "$LASTSEEN" +"%Y-%m-%d %H:%M.%S")
 
-	echo -n $LAST_SEC
+	echo -n "$LAST_SEC"
 }
 
 ## Adding static syncthing-hosts ##############################################
@@ -222,25 +224,25 @@ HOSTIP="127.0.0.1"
 HOSTPORT="8384"
 HOSTAPI=""
 
-for PARAM in $* ; do
-	OPTION=`echo $PARAM | sed -es/"^\([^=]*\)=.*$"/"\1"/`
-	VALUE=`echo $PARAM | sed -es/"^[^=]*=\([^=]*\)$"/"\1"/ | grep -v "^--"`
+for PARAM in "$@" ; do
+	OPTION=$(echo "$PARAM" | sed -es/"^\([^=]*\)=.*$"/"\1"/)
+	VALUE=$(echo "$PARAM" | sed -es/"^[^=]*=\([^=]*\)$"/"\1"/ | grep -v "^--")
 
 	case $OPTION in 
 		"--ip")
-			[ -z "$SYNCTHING_HOST" ] && SYNCTHING_HOST=`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13`
-			HOSTIP=$VALUE
+			[ -z "$SYNCTHING_HOST" ] && SYNCTHING_HOST=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13)
+			HOSTIP="$VALUE"
 			;;
 		"--port")
-			[ -z "$SYNCTHING_HOST" ] && SYNCTHING_HOST=`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13`
-			HOSTPORT=$VALUE
+			[ -z "$SYNCTHING_HOST" ] && SYNCTHING_HOST=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13)
+			HOSTPORT="$VALUE"
 			;;
 		"--apikey")
-			[ -z "$SYNCTHING_HOST" ] && SYNCTHING_HOST=`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13`
-			HOSTAPI=$VALUE
+			[ -z "$SYNCTHING_HOST" ] && SYNCTHING_HOST=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13)
+			HOSTAPI="$VALUE"
 			;;
 		"--host")
-			if [[ ! " ${SYNCTHING_HOSTS[@]} " =~ " ${VALUE} " ]] ; then
+			if [[ ! " ${SYNCTHING_HOSTS[*]} " == *" ${VALUE} "* ]] ; then
 				echo "Host '$VALUE' is not known by the script"
 				echo "Please define '$VALUE' by calling add_syncthing_host"
 				exit 0
@@ -314,7 +316,7 @@ fi
 
 ## if not hardcoded host should be added: do it ###############################
 ###############################################################################
-if [[ ! " ${SYNCTHING_HOSTS[@]} " =~ " ${SYNCTHING_HOST} " ]] ; then
+if [[ ! " ${SYNCTHING_HOSTS[*]} " == *" ${SYNCTHING_HOST} "* ]] ; then
 	if [ -z "$HOSTAPI" ] ; then
 		echo "If --ip and/or --port are defined to add a syncthing-host, --apikey is required"
 		echo "You may hard-code syncthing-hosts into the script by calling add_syncthing_host"
@@ -328,30 +330,30 @@ fi
 
 case "$SYNCTHING_ACTION" in
 	"lastseen")
-		DEVS=`get_folder_device_ids "$SYNCTHING_HOST" "$SYNCTHING_FOLDER"`
+		DEVS=$(get_folder_device_ids "$SYNCTHING_HOST" "$SYNCTHING_FOLDER")
 
 		for DEV in $DEVS ; do
-			RETURN=`get_device_lastseen "$SYNCTHING_HOST" "$DEV"`
+			RETURN=$(get_device_lastseen "$SYNCTHING_HOST" "$DEV")
 		done
 		;;
 	"lastsync")
-		RETURN=`get_folder_lastsync_time "$SYNCTHING_HOST" "$SYNCTHING_FOLDER"`
+		RETURN=$(get_folder_lastsync_time "$SYNCTHING_HOST" "$SYNCTHING_FOLDER")
 		;;
 	"lastscan")
-		RETURN=`get_folder_lastscan "$SYNCTHING_HOST" "$SYNCTHING_FOLDER"`
+		RETURN=$(get_folder_lastscan "$SYNCTHING_HOST" "$SYNCTHING_FOLDER")
 		;;
 	"lastfile")
-		RETURN=`get_folder_lastsync_file "$SYNCTHING_HOST" "$SYNCTHING_FOLDER"`
+		RETURN=$(get_folder_lastsync_file "$SYNCTHING_HOST" "$SYNCTHING_FOLDER")
 		;;
 	"status")
 		if [ -z "$ZABBIX_HOST" ] && [ -n "$SYNCTHING_STATUS_FLAGS" ] ; then
 			echo "--zabbix-host is required when asking for status"
 			exit 1
 		fi
-		RETURN=`get_folder_status "$SYNCTHING_HOST" "$SYNCTHING_FOLDER" "$SYNCTHING_STATUS_FLAGS"`
+		RETURN=$(get_folder_status "$SYNCTHING_HOST" "$SYNCTHING_FOLDER" "$SYNCTHING_STATUS_FLAGS")
 		;;
 esac
 
-echo $RETURN
+echo "$RETURN"
 
 exit 0

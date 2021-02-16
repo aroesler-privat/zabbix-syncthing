@@ -24,7 +24,7 @@ function create_zabbix_input() { ##############################################
 # creates input for zabbix_send-command                                       #
 # -> no parameter: initializes STRING to ""                                   #
 # -> any parameter is added to the string                                     #
-# -> format: ZABBIXHOST_NAME ZAXXIXITEM_KEY TIMESTAMP VALUE                   #
+# -> format: ZABBIXHOST_NAME ZABBIXITEM_KEY TIMESTAMP VALUE                   #
 # -> per function-call a newline is added                                     #
 # -> use as: echo $ZABBIX_INPUT | tr '|' '\n'                                 #
 ###############################################################################

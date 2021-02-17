@@ -548,7 +548,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>syncthing.sh[&quot;--folder={$SYNCTHING_FOLDER}&quot;,&quot;--status=globalBytes,globalFiles,inSyncBytes,inSyncFiles,needBytes,needFiles,pullErrors,state&quot;,&quot;--zabbix-host={$ZABBIX_SERVER}&quot;,&quot;--ip={$SYNCTHING_IP}&quot;,&quot;--port={$SYNCTHING_PORT}&quot;,&quot;--apikey={$SYNCTHING_APIKEY}&quot;]</key>
+                    <key>syncthing.sh[&quot;--folder={$SYNCTHING_FOLDER}&quot;,&quot;--status=globalBytes,globalFiles,inSyncBytes,inSyncFiles,needBytes,needFiles,pullErrors,state&quot;,&quot;--zabbix-host={$ZABBIX_HOST}&quot;,&quot;--ip={$SYNCTHING_IP}&quot;,&quot;--port={$SYNCTHING_PORT}&quot;,&quot;--apikey={$SYNCTHING_APIKEY}&quot;]</key>
                     <delay>300</delay>
                     <history>90</history>
                     <trends>365</trends>

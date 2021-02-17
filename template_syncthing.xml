@@ -606,7 +606,7 @@
                 </macro>
                 <macro>
                     <macro>{$ZABBIX_HOST}</macro>
-                    <value></value>
+                    <value>zabbix</value>
                 </macro>
             </macros>
             <templates/>

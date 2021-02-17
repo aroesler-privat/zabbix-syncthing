@@ -607,8 +607,8 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template Syncthing Folder:syncthing.sh[--folder={HOST.HOST},--status=globalBytes,globalFiles,inSyncBytes,inSyncFiles,needBytes,needFiles,pullErrors,state,--zabbix-host={HOST.HOST},--ip={$SYNCTHING_IP},--port={$SYNCTHING_PORT},--apikey={$SYNCTHING_APIKEY}].last(#3)}<,>;0</expression>
-            <name>sync error <,> 0 for the 3rd time in a row</name>
+            <expression>{Template Syncthing Folder:syncthing.sh[--folder={HOST.HOST},--status=globalBytes,globalFiles,inSyncBytes,inSyncFiles,needBytes,needFiles,pullErrors,state,--zabbix-host={HOST.HOST},--ip={$SYNCTHING_IP},--port={$SYNCTHING_PORT},--apikey={$SYNCTHING_APIKEY}].last(#3)}&lt;&gt;0</expression>
+            <name>sync error &lt;&gt; 0 for the 3rd time in a row</name>
             <url/>
             <status>0</status>
             <priority>3</priority>

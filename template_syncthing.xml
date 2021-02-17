@@ -548,7 +548,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>syncthing.sh[&quot;--folder={$SYNCTHING_FOLDER}&quot;,&quot;--status=globalBytes,globalFiles,inSyncBytes,inSyncFiles,needBytes,needFiles,pullErrors,state&quot;,&quot;--zabbix-host={$ZABBIX_HOST}&quot;,&quot;--ip={$SYNCTHING_IP}&quot;,&quot;--port={$SYNCTHING_PORT}&quot;,&quot;--apikey={$SYNCTHING_APIKEY}&quot;]</key>
+                    <key>syncthing.sh[&quot;--folder={$SYNCTHING_FOLDER}&quot;,&quot;--status=globalBytes,globalFiles,inSyncBytes,inSyncFiles,needBytes,needFiles,pullErrors,state&quot;,&quot;--zabbix-host={HOST.HOST}&quot;,&quot;--ip={$SYNCTHING_IP}&quot;,&quot;--port={$SYNCTHING_PORT}&quot;,&quot;--apikey={$SYNCTHING_APIKEY}&quot;]</key>
                     <delay>300</delay>
                     <history>90</history>
                     <trends>365</trends>
@@ -608,10 +608,6 @@
                     <macro>{$ZABBIX_SERVER}</macro>
                     <value>127.0.0.1</value>
                 </macro>
-                <macro>
-                    <macro>{$ZABBIX_HOST}</macro>
-                    <value>zabbix</value>
-                </macro>
             </macros>
             <templates/>
             <screens/>
@@ -619,7 +615,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template Syncthing Folder:syncthing.sh[&quot;--folder={$SYNCTHING_FOLDER}&quot;,&quot;--status=globalBytes,globalFiles,inSyncBytes,inSyncFiles,needBytes,needFiles,pullErrors,state&quot;,&quot;--zabbix-host={$ZABBIX_HOST}&quot;,&quot;--ip={$SYNCTHING_IP}&quot;,&quot;--port={$SYNCTHING_PORT}&quot;,&quot;--apikey={$SYNCTHING_APIKEY}&quot;].last(#3)}&lt;&gt;0</expression>
+            <expression>{Template Syncthing Folder:syncthing.sh[&quot;--folder={$SYNCTHING_FOLDER}&quot;,&quot;--status=globalBytes,globalFiles,inSyncBytes,inSyncFiles,needBytes,needFiles,pullErrors,state&quot;,&quot;--zabbix-host={HOST.HOST}&quot;,&quot;--ip={$SYNCTHING_IP}&quot;,&quot;--port={$SYNCTHING_PORT}&quot;,&quot;--apikey={$SYNCTHING_APIKEY}&quot;].last(#3)}&lt;&gt;0</expression>
             <name>sync error &lt;&gt; 0 for the 3rd time in a row</name>
             <url/>
             <status>0</status>

@@ -597,6 +597,10 @@
                     <value>Enter IP here</value>
                 </macro>
                 <macro>
+                    <macro>{$SYNCTHING_FOLDER}</macro>
+                    <value>Enter folder name here</value>
+                </macro>
+                <macro>
                     <macro>{$SYNCTHING_PORT}</macro>
                     <value>8384</value>
                 </macro>

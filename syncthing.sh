@@ -206,7 +206,7 @@ function get_device_lastseen() { ##############################################
 	HOST=$1
 	ID=$2
 
-	LASTSEEN=$($CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://"${SYNCTHING_IP[$HOST]}":"${SYNCTHING_PORT[$HOST]}"/rest/stats/device | jq ".\"$ID\".lastSeen" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/)
+	LASTSEEN=$($CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://"${SYNCTHING_IP[$HOST]}":"${SYNCTHING_PORT[$HOST]}"/rest/stats/device | $JQ ".\"$ID\".lastSeen" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/)
 
 	LAST_SEC=$($DATE -d "$LASTSEEN" +"%Y-%m-%d %H:%M.%S")
 

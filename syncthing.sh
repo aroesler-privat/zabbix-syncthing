@@ -79,9 +79,9 @@ function get_folder_id() { ####################################################
 	HOST=$1
 	NAME=$2
 
-	ID=$($CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://"${SYNCTHING_IP[$HOST]}":"${SYNCTHING_PORT[$HOST]}"/rest/system/config | $JQ ".folders[] | select(.label | contains(\"$NAME\"))" | $JQ '.id')
+	ID=$($CURL -s -X GET -H "X-API-Key: ${SYNCTHING_API[$HOST]}" http://"${SYNCTHING_IP[$HOST]}":"${SYNCTHING_PORT[$HOST]}"/rest/system/config | $JQ ".folders[] | select(.label | contains(\"$NAME\"))" | $JQ '.id' | sed -es/"^\"\([^\"]*\)\"$"/"\1"/)
 
-	echo -n "$ID" | sed -es/"^\"\([^\"]*\)\"$"/"\1"/
+	echo -n "$ID"
 }
 
 function get_folder_device_ids() { ############################################

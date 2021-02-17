@@ -604,10 +604,6 @@
                     <macro>{$SYNCTHING_PORT}</macro>
                     <value>8384</value>
                 </macro>
-                <macro>
-                    <macro>{$ZABBIX_SERVER}</macro>
-                    <value>127.0.0.1</value>
-                </macro>
             </macros>
             <templates/>
             <screens/>

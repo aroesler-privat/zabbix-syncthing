@@ -29,7 +29,7 @@ To access Syncthing you need an API-Key. You get it by looking in Syncthing's We
 * adding your host: <code>add_syncthing_host "INTERNALHOSTNAME" "IP" "PORT" "API Key"</code>
 You may address such an host by using the <code>--host=INTERNALHOSTNAME</code>-parameter.
 
-Now download the template (template_syncthing.xml) and add it to your Zabbix via Configuration -> Templates -> Import. In the template directly or in the <code>HOST</code> macros fill in required ones namely:<code>{$SYNCTHING_APIKEY}</code>, <code>{$SYNCTHING_IP}</code>, <code>{$SYNCTHING_FOLDER}</code>. If you use non standard port (8384) additionally set <code>{$SYNCTHING_PORT}</code>.
+Now download the template (template_syncthing.xml) and add it to your Zabbix via Configuration -> Templates -> Import. In the template directly or in the <code>HOST</code> macros fill in required ones namely:<code>{$SYNCTHING_APIKEY}</code>, <code>{$SYNCTHING_IP}</code>, <code>{$SYNCTHING_FOLDER}</code>. If you use non standard port (8384) at SYNCTHING additionally set <code>{$SYNCTHING_PORT}</code>.
 
 ## Background
 You will realize there are two applications setup: <code>general</code> and <code>folder-stats</code>. While the items listed under <code>general</code> are each calling the script and directly receiving data, the <code>folder-stats</code>-items are slighlty more complex. 

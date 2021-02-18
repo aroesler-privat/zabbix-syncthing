@@ -1,5 +1,9 @@
 # zabbix-syncthing
 
+It's a fork of https://github.com/aroesler-privat/zabbix-syncthing with some fixes.
+
+Original readme with some edits:
+
 ## About
 It was about Christmas and I started to feel a little nerdy. So inside of me a wish was growing up: I wanted to have an overview over all the backup- and sync-processes I run during the day. So I installed Zabbix and started to play around with its extensions.
 This is a Bash-script consuming (one says so, right?) the RestAPI of Syncthing. When installed in your Zabbix-scripts-directory and after deploying the Template you may see the following data per Syncthing-folder:
@@ -14,9 +18,10 @@ Furthermore a quite expensive /rest/db/status-call is done to catch values like:
 * errors, pullErrors: amount of files that failed
 
 ## Install and Configure
-1. download syncthing.sh and install it to you ExternalScripts-directory (zabbix_server.conf -> ExternalScripts)
-2. make it executable: <code>chmod a+x syncthing.sh</code>
-3. carefully read the output of <code>./syncthing.sh --help</code> - I hate to document and I did it just for you! ;-)
+1. install <code>jq</code> and <code>zabbix-sender</code> (it's not included in server/agent packages)
+2. download syncthing.sh and install it to you ExternalScripts-directory (zabbix_server.conf -> ExternalScripts)
+3. make it executable: <code>chmod a+x syncthing.sh</code>
+4. carefully read the output of <code>./syncthing.sh --help</code> - I hate to document and I did it just for you! ;-)
 
 To access Syncthing you need an API-Key. You get it by looking in Syncthing's WebApp at Actions -> Advanced. By default the Syncthing-Server can be defined via commandline (--ip, --port, --apikey -> the template is intended to use this too). But there might be situations in which you don't want to have your API-Key stored on Zabbix. In these cases you may add one or many Syncthing-hosts by:
 * opening syncthing.sh
@@ -24,7 +29,7 @@ To access Syncthing you need an API-Key. You get it by looking in Syncthing's We
 * adding your host: <code>add_syncthing_host "INTERNALHOSTNAME" "IP" "PORT" "API Key"</code>
 You may address such an host by using the <code>--host=INTERNALHOSTNAME</code>-parameter.
 
-Now download the template (template_syncthing.xml) and add it to your Zabbix via Configuration -> Templates -> Import. In the template directly go to the Macros-menu (well hidden as sub-tab in the first tab) and either add your Syncthing-Server-details or create a new <code>--host</code>-macro and edit all the items to use it.
+Now download the template (template_syncthing.xml) and add it to your Zabbix via Configuration -> Templates -> Import. In the template directly or in the <code>HOST</code> macros fill in required ones namely:<code>{$SYNCTHING_APIKEY}</code>, <code>{$SYNCTHING_IP}</code>, <code>{$SYNCTHING_FOLDER}</code>. If you use non standard port (8384) at SYNCTHING additionally set <code>{$SYNCTHING_PORT}</code>.
 
 ## Background
 You will realize there are two applications setup: <code>general</code> and <code>folder-stats</code>. While the items listed under <code>general</code> are each calling the script and directly receiving data, the <code>folder-stats</code>-items are slighlty more complex. 
